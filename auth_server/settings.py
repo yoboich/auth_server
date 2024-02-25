@@ -25,10 +25,14 @@ SECRET_KEY = 'django-insecure-$+-q*z=*sebil!t@hrz^^0f@%ot2r4pr8-+za^cz*&gfaf@z8-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+# CSRF_TRUSTED_ORIGINS = ['*']
 
+AUTH_USER_MODEL = 'users.CustomUser'
 
-# Application definition
+LOGIN_URL='/admin/login/'
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
-    'rest_framework'
+    'rest_framework',
+    'oauth2_provider',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -47,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -57,7 +64,7 @@ ROOT_URLCONF = 'auth_server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +75,12 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+    # Uncomment following if you want to access the admin
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 WSGI_APPLICATION = 'auth_server.wsgi.application'
@@ -124,3 +137,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+OAUTH2_PROVIDER = {
+    "PKCE_REQUIRED": False,
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'introspection': 'Introspect token scope',
+    },
+}
